@@ -28,24 +28,39 @@ function writeTokenData(data) {
   fs.writeFileSync(TOKEN_FILE_PATH, JSON.stringify(data, null, 2), 'utf8');
 }
 
+function getRedirectUri(req) {
+  if (process.env.GOOGLE_REDIRECT_URI && process.env.GOOGLE_REDIRECT_URI.startsWith('http') && !process.env.GOOGLE_REDIRECT_URI.includes('localhost')) {
+    return process.env.GOOGLE_REDIRECT_URI;
+  }
+  if (req) {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers.host;
+    return `${protocol}://${host}/api/auth/google/callback`;
+  }
+  return process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/api/auth/google/callback';
+}
+
 /**
- * Creates a raw OAuth2 client instance using environment configuration.
+ * Creates a raw OAuth2 client instance using environment configuration or dynamic request host.
+ * @param {Object} [req] - Express request object
  * @returns {google.auth.OAuth2}
  */
-function createOAuth2Client() {
+function createOAuth2Client(req) {
+  const redirectUri = getRedirectUri(req);
   return new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    redirectUri
   );
 }
 
 /**
  * Generates the Google OAuth 2.0 consent URL for Gmail and Calendar read-only scopes.
+ * @param {Object} [req] - Express request object
  * @returns {string} Auth consent screen URL
  */
-function getAuthUrl() {
-  const oAuth2Client = createOAuth2Client();
+function getAuthUrl(req) {
+  const oAuth2Client = createOAuth2Client(req);
   return oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
@@ -56,14 +71,15 @@ function getAuthUrl() {
 /**
  * Exchanges authorization code for tokens and stores tokens locally in GBrain store.
  * @param {string} code - Authorization code from Google OAuth callback
+ * @param {Object} [req] - Express request object
  * @returns {Promise<Object>} { tokenDoc, user }
  */
-async function handleCallback(code) {
+async function handleCallback(code, req) {
   if (!code) {
     throw new Error('Authorization code is required');
   }
 
-  const oAuth2Client = createOAuth2Client();
+  const oAuth2Client = createOAuth2Client(req);
   const { tokens } = await oAuth2Client.getToken(code);
   oAuth2Client.setCredentials(tokens);
 
