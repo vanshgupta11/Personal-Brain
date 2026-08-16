@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: personal-brain
+    env: node
+    buildCommand: npm install --prefix server && npm install --prefix client && npm run build --prefix client
+    startCommand: node server/src/server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
