@@ -29,15 +29,16 @@ function writeTokenData(data) {
 }
 
 function getRedirectUri(req) {
-  if (process.env.GOOGLE_REDIRECT_URI && process.env.GOOGLE_REDIRECT_URI.startsWith('http') && !process.env.GOOGLE_REDIRECT_URI.includes('localhost')) {
-    return process.env.GOOGLE_REDIRECT_URI;
+  const envUri = (process.env.GOOGLE_REDIRECT_URI || '').trim();
+  if (envUri && envUri.startsWith('http') && !envUri.includes('localhost')) {
+    return envUri;
   }
   if (req) {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host = req.headers.host;
     return `${protocol}://${host}/api/auth/google/callback`;
   }
-  return process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/api/auth/google/callback';
+  return envUri || 'http://localhost:5000/api/auth/google/callback';
 }
 
 /**
