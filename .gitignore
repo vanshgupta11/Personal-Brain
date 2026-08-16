@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.env
+tokens.json
+**/tokens.json
+
+# GBrain Storage Data (User Ingested Data)
+server/data/gbrain/emails/*
+!server/data/gbrain/emails/.gitkeep
+server/data/gbrain/events/*
+!server/data/gbrain/events/.gitkeep
+
+# Build and Output Folders
+dist/
+build/
+client/dist/
+.vite/
+**/dist/
+
+# Logs and Debug Output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Scratch and Temporary files
+scratch/
+**/scratch/
+.tmp/
+*.tmp
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini

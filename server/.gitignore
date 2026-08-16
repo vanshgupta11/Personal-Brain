@@ -1,0 +1,18 @@
+# Server Node Dependencies
+node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.*
+tokens.json
+data/gbrain/tokens.json
+
+# GBrain Storage Files
+data/gbrain/emails/*
+!data/gbrain/emails/.gitkeep
+data/gbrain/events/*
+!data/gbrain/events/.gitkeep
+
+# Logs & Scratch Scripts
+*.log
+scratch/
